@@ -4,28 +4,27 @@ from enum import Enum, auto
 from typing import Callable, Iterable, List
 
 
-class LexemeType(Enum):
-    IDENTIFIER = auto()
-    NUMBER = auto()
-    VAR = auto()
-    BEGIN = auto()
-    END = auto()
-    READ = auto()
-    WRITE = auto()
-    FOR = auto()
-    TO = auto()
-    STEP = auto()
-    NOT = auto()
-    ADDITIVE = auto()
-    MULTIPLICATIVE = auto()
-    ASSIGMENT = auto()
-    SPECIAL = auto()
-
-
 @dataclass
 class Lexeme:
+    class Type(Enum):
+        IDENTIFIER = auto()
+        NUMBER = auto()
+        VAR = auto()
+        BEGIN = auto()
+        END = auto()
+        READ = auto()
+        WRITE = auto()
+        FOR = auto()
+        TO = auto()
+        STEP = auto()
+        NOT = auto()
+        ADDITIVE = auto()
+        MULTIPLICATIVE = auto()
+        ASSIGMENT = auto()
+        SPECIAL = auto()
+
     value: str
-    type: LexemeType
+    type: Type
 
 
 class Transfer:
@@ -70,9 +69,11 @@ class LexicalAnalysisError(Exception):
 
 
 class LexicalAnalyzer:
-    def __init__(self, table: List[List[Transfer]], resolve_states: List[int]):
+    def __init__(self, table: List[List[Transfer]], resolve_states: List[int],
+                 lexeme_factory: Callable[[int, str], Lexeme]):
         self._table = table
         self._resolve_states = resolve_states
+        self._lexeme_factory = lexeme_factory
         self._lexemes = []
 
     @property
@@ -96,7 +97,7 @@ class LexicalAnalyzer:
                 i += 1
             else:
                 if state in self._resolve_states:
-                    self._lexemes.append(buffer)
+                    self._lexemes.append(self._lexeme_factory(state, buffer))
                     state = 0
                     buffer = ''
                 else:

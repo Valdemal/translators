@@ -1,4 +1,4 @@
-from lexical import PredicateTransfer, ValueTransfer, ManyValuesTransfer
+from lexical import PredicateTransfer, ValueTransfer, ManyValuesTransfer, Lexeme
 
 TABLE = [
     [
@@ -17,9 +17,8 @@ TABLE = [
         ValueTransfer('s', 29),
         ValueTransfer(':', 32),
         ManyValuesTransfer(['+', '-', '*', '(', ')', ','], 33),
-        ValueTransfer('-', 34),
-        PredicateTransfer(lambda char: char in '123456789', 35),
-        ValueTransfer('/', 36),
+        PredicateTransfer(lambda char: char in '123456789', 34),
+        ValueTransfer('/', 35),
         PredicateTransfer(str.isalnum, 1)
     ],  # s0
     [PredicateTransfer(str.isalnum, 1)],  # s1
@@ -64,3 +63,21 @@ TABLE = [
 ]
 
 RESOLVE_STATES = [1, 4, 12, 33, 34, 35, 38, 39]
+
+
+def lexeme_factory(state: int, value: str) -> Lexeme:
+    if state == 1:
+        return Lexeme(value, Lexeme.Type.IDENTIFIER)
+    elif state == 34:
+        return Lexeme(value, Lexeme.Type.NUMBER)
+    else:
+        return Lexeme(value, {
+            'or': Lexeme.Type.ADDITIVE, 'xor': Lexeme.Type.ADDITIVE,
+            'and': Lexeme.Type.MULTIPLICATIVE, 'not': Lexeme.Type.NOT,
+            'var': Lexeme.Type.VAR, 'begin': Lexeme.Type.BEGIN, 'end': Lexeme.Type.END,
+            'read': Lexeme.Type.READ, 'write': Lexeme.Type.WRITE, 'for': Lexeme.Type.FOR,
+            'to': Lexeme.Type.TO, 'step': Lexeme.Type.STEP, ':=': Lexeme.Type.ASSIGMENT,
+            '+': Lexeme.Type.ADDITIVE, '-': Lexeme.Type.ADDITIVE, '*': Lexeme.Type.MULTIPLICATIVE,
+            '/': Lexeme.Type.MULTIPLICATIVE, '(': Lexeme.Type.SPECIAL, ')': Lexeme.Type.SPECIAL,
+            ',': Lexeme.Type.SPECIAL
+        }[value])
