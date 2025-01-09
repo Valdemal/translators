@@ -9,7 +9,7 @@ if __name__ == '__main__':
     # буква a не обрабатывается (понятно почему)
     # сделать цикл с комментариями
 
-    text = "BEGIN VAR aa:=bbb123n +nnb end - begin122 ag / + ( , ) * 123 "
+    text = "BEGIN VAR aa:=bbb123n +nnb /*комментарий*/ end - begin122 ag / + ( , ) * 123\n"
     analyzer = LexicalAnalyzer(TABLE, RESOLVE_STATES, lexeme_factory)
     analyzer.analyze(text)
     pprint(analyzer.lexemes)

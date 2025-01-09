@@ -57,12 +57,11 @@ TABLE = [
     [PredicateTransfer(str.isdigit, 34)],  # s34 разрешающее состояние
     [ValueTransfer('*', 36)],  # s35 разрешающее состояние
     [PredicateTransfer(lambda char: char != '*', 36), ValueTransfer('*', 37)],  # s36
-    [ValueTransfer('/', 38)],  # s37
+    [ValueTransfer('/', 0)],  # s37
     [],  # s38 разрешающее состояние
-    [],  # s39 разрешающее состояние(начало новой лексемы)
 ]
 
-RESOLVE_STATES = [1, 4, 12, 33, 34, 35, 38, 39]
+RESOLVE_STATES = [1, 4, 12, 33, 34, 35, 38]
 
 
 def lexeme_factory(state: int, value: str) -> Lexeme:
