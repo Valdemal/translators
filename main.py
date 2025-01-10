@@ -1,15 +1,12 @@
-from pprint import pprint
-
-from lexical import LexicalAnalyzer
-from table import TABLE, RESOLVE_STATES, lexeme_factory
+from config import TABLE, lexeme_factory
+from lexical.analyzer import LexicalAnalyzer
 
 if __name__ == '__main__':
-    # todo не может нормально разобрать строку
-    # последняя лексема пропадает
-    # буква a не обрабатывается (понятно почему)
-    # сделать цикл с комментариями
-
-    text = "BEGIN VAR aa:=bbb123n +nnb /*комментарий*/ end - begin122 ag / + ( , ) * 123\n"
-    analyzer = LexicalAnalyzer(TABLE, RESOLVE_STATES, lexeme_factory)
+    text = "BEGIN VAR aa := bbb123n +nnb /*комментарий*/ end - begin122 ag / + (,) * 123 not  and"
+    analyzer = LexicalAnalyzer(TABLE, lexeme_factory)
     analyzer.analyze(text)
-    pprint(analyzer.lexemes)
+
+    print("Лексема".ljust(15), '|', "Тип лексемы".ljust(20))
+    print('-' * 37)
+    for lexeme in analyzer.lexemes:
+        print(lexeme.value.ljust(15), '|', str(lexeme.type).ljust(20))
