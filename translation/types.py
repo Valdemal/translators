@@ -28,6 +28,12 @@ class Lexeme:
     value: str
     type: Type
 
+    def compare(self, other: 'Lexeme' or 'Lexeme.Type') -> bool:
+        if isinstance(other, Lexeme.Type):
+            return self.type == other
+        elif isinstance(other, Lexeme):
+            return self.type == other.type
+
 
 StackSymbol = Lexeme or str or 'Translation'
 

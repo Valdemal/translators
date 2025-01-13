@@ -1,21 +1,26 @@
 from typing import List
 
-from translation.types import StackSymbol
+from translation.types import StackSymbol, Lexeme
 
 
 class Store:
-    def __init__(self):
+    def __init__(self, lexemes: list[Lexeme]):
         self._index = 0
         self._output = ''
         self._stack: List[StackSymbol] = ['S']
+        self._lexemes = lexemes
 
     @property
-    def is_empty(self) -> bool:
+    def stack_is_empty(self) -> bool:
         return len(self._stack) == 0
 
     @property
-    def index(self) -> int:
-        return self._index
+    def current_lexeme(self) -> Lexeme:
+        return self._lexemes[self._index]
+
+    @property
+    def is_end(self) -> bool:
+        return self._index == len(self._lexemes)
 
     @property
     def output(self) -> str:

@@ -10,35 +10,31 @@ class SyntaxAnalyzer:
     def __init__(self, rules_to_choices: List[Tuple[Rule, List[Lexeme.Type]]]):
         self._table = {}
         for rule, choices_set in rules_to_choices:
+            if self._table.get(rule.left) is None:
+                self._table[rule.left] = {}
+
             operation = self.__make_operation(rule.right)
-            self._table[rule.left] = {}
-            for lexeme_type in choices_set:
-                self._table[rule.left][lexeme_type] = operation
+            self._table[rule.left] |= {lexeme_type: operation for lexeme_type in choices_set}
 
     def analyze(self, lexemes: list[Lexeme]) -> str:
-        store = Store()
+        store = Store(lexemes)
 
-        while store.index < len(lexemes):
+        while not store.is_end:
+            if store.current_lexeme.type == Lexeme.Type.END_OF_PROGRAM and store.stack_is_empty:
+                return store.output
+
             top = store.peek()
-            current = lexemes[store.index]
 
-            if isinstance(top, Lexeme) and top.Type == current.Type:
+            if isinstance(top, str) and (operation := self._table[top].get(store.current_lexeme.type)):
+                operation(store)
+            elif store.current_lexeme.compare(top):
                 store.pop()
                 store.shift()
-
             elif isinstance(top, Action):
+                store.pop()
                 top(store)
-
-            elif isinstance(top, str) and (operation := self._table[top].get(current.type)):
-                operation(store)
-
             else:
-                raise SyntaxAnalysisError(current, store)
-
-        if not store.is_empty:
-            raise SyntaxAnalysisError('', store)
-
-        return store.output
+                raise SyntaxAnalysisError(store.current_lexeme, store)
 
     @staticmethod
     def __make_operation(symbols: List[StackSymbol] or None):
@@ -52,6 +48,7 @@ class SyntaxAnalyzer:
                 def lexeme_operation_with_transition(store):
                     symbols[1](store)
                     store.replace(symbols[:1:-1])
+                    store.shift()
 
                 return lexeme_operation_with_transition
             else:

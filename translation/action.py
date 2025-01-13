@@ -1,7 +1,6 @@
 from abc import abstractmethod, ABC
 
 from translation.store import Store
-from translation.types import Lexeme
 
 
 class Action(ABC):
@@ -32,23 +31,14 @@ class ValueAction(Action):
 
 class LexemeAction(Action):
     def __call__(self, store: Store):
-        if isinstance(store.peek(), Lexeme):
-            store.append(store.peek().value)
-        else:
-            print("Кажись ошибка")
+        store.append(store.current_lexeme.value)
 
 
 class ReadAction(Action):
     def __call__(self, store: Store):
-        if isinstance(store.peek(), Lexeme):
-            store.append(f'printf("i = "); scanf(&{store.peek().value});')
-        else:
-            print("Кажись ошибка")
+        store.append(f'printf("i = "); scanf(&{store.current_lexeme.value});')
 
 
 class WriteAction(Action):
     def __call__(self, store: Store):
-        if isinstance(store.peek(), Lexeme):
-            store.append(f'printf("i = %d\n", {store.peek().value});')
-        else:
-            print("Кажись ошибка")
+        store.append(f'printf("i = %d\n", {store.current_lexeme.value});')
