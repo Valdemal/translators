@@ -1,11 +1,11 @@
 from typing import List, Tuple
 
-from lexical.analyzer import Lexeme
-from lexical.conditions import ValueCondition, ManyValuesCondition
-from lexical.state import State
-from lexical.transfer import SkipTransfer, Transfer, DropTransfer, HoldTransfer
-from syntax.types import Rule
-from syntax.translation import ValueTranslation, LexemeTranslation, ReadTranslation, WriteTranslation
+from translation.lexical import Lexeme
+from translation.conditions import ValueCondition, ManyValuesCondition
+from translation.state import State
+from translation.transfer import SkipTransfer, Transfer, DropTransfer, HoldTransfer
+from translation.types import Rule
+from translation.action import ValueAction, LexemeAction, ReadAction, WriteAction
 
 TABLE = [
     State(
@@ -89,11 +89,11 @@ def lexeme_factory(state: int, value: str) -> Lexeme:
 
 rules_to_choices: List[Tuple[Rule, List[Lexeme.Type]]] = [
     (
-        Rule('S', [Lexeme.Type.VAR, ValueTranslation('int '), 'V', Lexeme.Type.BEGIN, ValueTranslation(';'), 'B']),
+        Rule('S', [Lexeme.Type.VAR, ValueAction('int '), 'V', Lexeme.Type.BEGIN, ValueAction(';'), 'B']),
         [Lexeme.Type.VAR]
     ),
-    (Rule('V', [Lexeme.Type.IDENTIFIER, LexemeTranslation(), 'I']), [Lexeme.Type.IDENTIFIER]),
-    (Rule('I', [Lexeme.Type.IDENTIFIER, LexemeTranslation() + ValueTranslation(','), 'I']), [Lexeme.Type.IDENTIFIER]),
+    (Rule('V', [Lexeme.Type.IDENTIFIER, LexemeAction(), 'I']), [Lexeme.Type.IDENTIFIER]),
+    (Rule('I', [Lexeme.Type.IDENTIFIER, LexemeAction() + ValueAction(','), 'I']), [Lexeme.Type.IDENTIFIER]),
     (Rule('I', None), [Lexeme.Type.BEGIN]),
     (Rule('B', ['O', 'C']), [Lexeme.Type.READ, Lexeme.Type.WRITE, Lexeme.Type.IDENTIFIER, Lexeme.Type.FOR]),
     (Rule('C', ['B']), [Lexeme.Type.READ, Lexeme.Type.WRITE, Lexeme.Type.IDENTIFIER, Lexeme.Type.FOR]),
@@ -103,20 +103,20 @@ rules_to_choices: List[Tuple[Rule, List[Lexeme.Type]]] = [
         Rule('O', [Lexeme.Type.WRITE, Lexeme.Type.OPENING_BRACKET, 'W', Lexeme.Type.CLOSING_BRACKET]),
         [Lexeme.Type.WRITE]
     ),
-    (Rule('O', [Lexeme.Type.IDENTIFIER, LexemeTranslation(), Lexeme.Type.ASSIGMENT, 'E']), [Lexeme.Type.IDENTIFIER]),
+    (Rule('O', [Lexeme.Type.IDENTIFIER, LexemeAction(), Lexeme.Type.ASSIGMENT, 'E']), [Lexeme.Type.IDENTIFIER]),
     (Rule('O', [Lexeme.Type]), [Lexeme.Type.FOR]),  # todo доделать цикл
-    (Rule('R', [Lexeme.Type.IDENTIFIER, ReadTranslation(), 'R']), [Lexeme.Type.IDENTIFIER]),
+    (Rule('R', [Lexeme.Type.IDENTIFIER, ReadAction(), 'R']), [Lexeme.Type.IDENTIFIER]),
     (Rule('R', None), [Lexeme.Type.CLOSING_BRACKET]),
-    (Rule('W', [Lexeme.Type.IDENTIFIER, WriteTranslation(), 'W']), [Lexeme.Type.IDENTIFIER]),
+    (Rule('W', [Lexeme.Type.IDENTIFIER, WriteAction(), 'W']), [Lexeme.Type.IDENTIFIER]),
     (Rule('W', None), [Lexeme.Type.CLOSING_BRACKET]),
     (Rule('E', ['T', 'F']), [Lexeme.Type.IDENTIFIER, Lexeme.Type.NUMBER, Lexeme.Type.NOT]),
-    (Rule('F', [Lexeme.Type.ASSIGMENT, LexemeTranslation(), 'T', 'F']), [Lexeme.Type.ASSIGMENT]),
+    (Rule('F', [Lexeme.Type.ASSIGMENT, LexemeAction(), 'T', 'F']), [Lexeme.Type.ASSIGMENT]),
     (Rule('F', None), [Lexeme.Type.END_OF_PROGRAM, Lexeme.Type.END, Lexeme.Type.TO, Lexeme.Type.CLOSING_BRACKET]),
     (Rule('T', ['M', 'Q']), [Lexeme.Type.IDENTIFIER, Lexeme.Type.NUMBER, Lexeme.Type.NOT]),
-    (Rule('Q', [Lexeme.Type.MULTIPLICATIVE, LexemeTranslation(), 'M', 'Q']), [Lexeme.Type.MULTIPLICATIVE]),
+    (Rule('Q', [Lexeme.Type.MULTIPLICATIVE, LexemeAction(), 'M', 'Q']), [Lexeme.Type.MULTIPLICATIVE]),
     (Rule('Q', None), [Lexeme.Type.END_OF_PROGRAM, Lexeme.Type.END, Lexeme.Type.TO, Lexeme.Type.CLOSING_BRACKET]),
-    (Rule('M', [Lexeme.Type.IDENTIFIER, LexemeTranslation()]), [Lexeme.Type.IDENTIFIER]),
+    (Rule('M', [Lexeme.Type.IDENTIFIER, LexemeAction()]), [Lexeme.Type.IDENTIFIER]),
     (Rule('M', [Lexeme.Type.NUMBER]), [Lexeme.Type.NUMBER]),
-    (Rule('M', [Lexeme.Type.NOT, LexemeTranslation(), Lexeme.Type.OPENING_BRACKET, LexemeTranslation(), 'E',
-                Lexeme.Type.CLOSING_BRACKET, LexemeTranslation()]), [Lexeme.Type.NOT]),
+    (Rule('M', [Lexeme.Type.NOT, LexemeAction(), Lexeme.Type.OPENING_BRACKET, LexemeAction(), 'E',
+                Lexeme.Type.CLOSING_BRACKET, LexemeAction()]), [Lexeme.Type.NOT]),
 ]

@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from lexical.text_wrapper import TextWrapper
+from .text_wrapper import TextWrapper
 
 
 class Transfer(ABC):

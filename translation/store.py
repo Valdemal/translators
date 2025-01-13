@@ -1,6 +1,6 @@
 from typing import List
 
-from syntax.types import StackSymbol
+from translation.types import StackSymbol
 
 
 class Store:
@@ -36,3 +36,9 @@ class Store:
     def replace(self, symbols: List[StackSymbol]):
         self._stack.pop()
         self._stack += symbols
+
+    def __str__(self):
+        return f"""
+        Index: {self._index};
+        Output: {self._output};
+        Stack:\n""" + "\n".join(map(str, reversed(self._stack)))

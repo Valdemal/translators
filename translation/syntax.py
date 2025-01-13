@@ -1,9 +1,9 @@
 from typing import List, Tuple
 
-from lexical.analyzer import Lexeme
-from syntax.store import Store
-from syntax.translation import Translation
-from syntax.types import Rule, StackSymbol
+from translation.action import Action
+from translation.exceptions import SyntaxAnalysisError
+from translation.store import Store
+from translation.types import Rule, Lexeme, StackSymbol
 
 
 class SyntaxAnalyzer:
@@ -22,23 +22,21 @@ class SyntaxAnalyzer:
             top = store.peek()
             current = lexemes[store.index]
 
-            if isinstance(top, Lexeme):
-                if top.Type == current.Type:
-                    store.pop()
-                    store.shift()
-                else:
-                    raise Exception('Ошибка при синтаксическом анализе')
+            if isinstance(top, Lexeme) and top.Type == current.Type:
+                store.pop()
+                store.shift()
 
-            elif isinstance(top, Translation):
+            elif isinstance(top, Action):
                 top(store)
 
             elif isinstance(top, str) and (operation := self._table[top].get(current.type)):
                 operation(store)
+
             else:
-                raise Exception('Синтаксическая ошибка на лексеме ' + str(current))
+                raise SyntaxAnalysisError(current, store)
 
         if not store.is_empty:
-            raise Exception('Ошибка')
+            raise SyntaxAnalysisError('', store)
 
         return store.output
 
@@ -50,7 +48,7 @@ class SyntaxAnalyzer:
 
         elif isinstance(symbols[0], Lexeme.Type):
 
-            if len(symbols) >= 2 and isinstance(symbols[1], Translation):
+            if len(symbols) >= 2 and isinstance(symbols[1], Action):
                 def lexeme_operation_with_transition(store):
                     symbols[1](store)
                     store.replace(symbols[:1:-1])

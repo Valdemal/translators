@@ -1,19 +1,19 @@
 from abc import abstractmethod, ABC
 
-from lexical.analyzer import Lexeme
-from syntax.store import Store
+from translation.store import Store
+from translation.types import Lexeme
 
 
-class Translation(ABC):
-    def __add__(self, other) -> 'Translation':
-        return TranslationComposite(self, other)
+class Action(ABC):
+    def __add__(self, other) -> 'Action':
+        return ActionComposite(self, other)
 
     @abstractmethod
     def __call__(self, store: Store):
         pass
 
 
-class TranslationComposite(Translation):
+class ActionComposite(Action):
     def __init__(self, *translations):
         self._translations = translations
 
@@ -22,7 +22,7 @@ class TranslationComposite(Translation):
             translation(store)
 
 
-class ValueTranslation(Translation):
+class ValueAction(Action):
     def __init__(self, value: str):
         self._value = value
 
@@ -30,7 +30,7 @@ class ValueTranslation(Translation):
         store.append(self._value)
 
 
-class LexemeTranslation(Translation):
+class LexemeAction(Action):
     def __call__(self, store: Store):
         if isinstance(store.peek(), Lexeme):
             store.append(store.peek().value)
@@ -38,7 +38,7 @@ class LexemeTranslation(Translation):
             print("Кажись ошибка")
 
 
-class ReadTranslation(Translation):
+class ReadAction(Action):
     def __call__(self, store: Store):
         if isinstance(store.peek(), Lexeme):
             store.append(f'printf("i = "); scanf(&{store.peek().value});')
@@ -46,7 +46,7 @@ class ReadTranslation(Translation):
             print("Кажись ошибка")
 
 
-class WriteTranslation(Translation):
+class WriteAction(Action):
     def __call__(self, store: Store):
         if isinstance(store.peek(), Lexeme):
             store.append(f'printf("i = %d\n", {store.peek().value});')

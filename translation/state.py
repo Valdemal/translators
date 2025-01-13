@@ -1,7 +1,7 @@
 from typing import Tuple, List
 
-from lexical.conditions import Condition
-from lexical.transfer import Transfer
+from translation.conditions import Condition
+from translation.transfer import Transfer
 
 
 class State:
