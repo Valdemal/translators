@@ -25,6 +25,7 @@ class Lexeme:
         OPENING_BRACKET = auto()
         CLOSING_BRACKET = auto()
         COMMA = auto()
+        END_OF_PROGRAM = auto()
 
     value: str
     type: Type
@@ -58,8 +59,12 @@ class LexicalAnalyzer:
                 text_wrapper.state_index = 0
                 text_wrapper.drop_buffer()
             else:
-                raise LexicalAnalysisError(f"Ошибка при лексическом анализе. Символ {text_wrapper.char}. Состояние {text_wrapper.state_index}")
+                raise LexicalAnalysisError(
+                    f"Ошибка при лексическом анализе. Символ {text_wrapper.char}. Состояние {text_wrapper.state_index}")
 
         state = self._table[text_wrapper.state_index]
         if not state.is_permissive:
-            raise LexicalAnalysisError(f"Ошибка при лексическом анализе. Символ {text_wrapper.char}. Состояние {text_wrapper.state_index}")
+            raise LexicalAnalysisError(
+                f"Ошибка при лексическом анализе. Символ {text_wrapper.char}. Состояние {text_wrapper.state_index}")
+
+        self._lexemes.append(Lexeme('┤', Lexeme.Type.END_OF_PROGRAM))
