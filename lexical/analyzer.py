@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import List
 
 from lexical.state import State
 from lexical.text_wrapper import TextWrapper
@@ -23,7 +22,9 @@ class Lexeme:
         ADDITIVE = auto()
         MULTIPLICATIVE = auto()
         ASSIGMENT = auto()
-        SPECIAL = auto()
+        OPENING_BRACKET = auto()
+        CLOSING_BRACKET = auto()
+        COMMA = auto()
 
     value: str
     type: Type
@@ -58,3 +59,7 @@ class LexicalAnalyzer:
                 text_wrapper.drop_buffer()
             else:
                 raise LexicalAnalysisError(f"Ошибка при лексическом анализе. Символ {text_wrapper.char}. Состояние {text_wrapper.state_index}")
+
+        state = self._table[text_wrapper.state_index]
+        if not state.is_permissive:
+            raise LexicalAnalysisError(f"Ошибка при лексическом анализе. Символ {text_wrapper.char}. Состояние {text_wrapper.state_index}")

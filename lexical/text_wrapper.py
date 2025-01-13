@@ -1,5 +1,4 @@
 class TextWrapper:
-
     def __init__(self, text: str):
         self._text = text
         self._index = 0
