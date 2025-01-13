@@ -87,27 +87,32 @@ def lexeme_factory(state: int, value: str) -> Lexeme:
         }[value])
 
 
-START_C_STRING = """
-#INCLUDE <stdio.h>
+START_C_STRING = ValueAction("""
+#include <stdio.h>
 
 int main() {
-    int """
+    int """)
 
-END_C_STRING = """
+END_C_STRING = ValueAction("""
     return 0;
 }
-"""
+""")
 
+END_LINE = ValueAction(';\n\t')
 rules_to_choices: List[Tuple[Rule, List[Lexeme.Type]]] = [
+    # 1
     (
-        Rule('S', [Lexeme.Type.VAR, ValueAction(START_C_STRING), 'V', Lexeme.Type.BEGIN, ValueAction(';\n\t'), 'B',
-                   ValueAction(END_C_STRING)]),
+        Rule('S', [Lexeme.Type.VAR, START_C_STRING, 'V', Lexeme.Type.BEGIN, END_LINE, 'B', END_C_STRING]),
         [Lexeme.Type.VAR]
     ),
+    # 2
     (Rule('V', [Lexeme.Type.IDENTIFIER, LexemeAction(), 'I']), [Lexeme.Type.IDENTIFIER]),
+    # 3
     (Rule('I', [Lexeme.Type.IDENTIFIER, ValueAction(',') + LexemeAction(), 'I']), [Lexeme.Type.IDENTIFIER]),
+    # 4
     (Rule('I', None), [Lexeme.Type.BEGIN]),
-    (Rule('B', ['O', ValueAction(';\n\t'), 'C']),
+    # 5
+    (Rule('B', ['O', 'C']),
      [Lexeme.Type.READ, Lexeme.Type.WRITE, Lexeme.Type.IDENTIFIER, Lexeme.Type.FOR]),
     (Rule('C', ['B']), [Lexeme.Type.READ, Lexeme.Type.WRITE, Lexeme.Type.IDENTIFIER, Lexeme.Type.FOR]),
     (Rule('C', None), [Lexeme.Type.END_OF_PROGRAM, Lexeme.Type.END]),
@@ -116,7 +121,7 @@ rules_to_choices: List[Tuple[Rule, List[Lexeme.Type]]] = [
         Rule('O', [Lexeme.Type.WRITE, Lexeme.Type.OPENING_BRACKET, 'W', Lexeme.Type.CLOSING_BRACKET]),
         [Lexeme.Type.WRITE]
     ),
-    (Rule('O', [Lexeme.Type.IDENTIFIER, LexemeAction(), Lexeme.Type.ASSIGMENT, ValueAction('='), 'E']),
+    (Rule('O', [Lexeme.Type.IDENTIFIER, LexemeAction(), Lexeme.Type.ASSIGMENT, ValueAction('='), 'E', END_LINE, ]),
      [Lexeme.Type.IDENTIFIER]),
     (Rule('O', [Lexeme.Type]), [Lexeme.Type.FOR]),  # todo доделать цикл
     (Rule('R', [Lexeme.Type.IDENTIFIER, ReadAction(), 'R']), [Lexeme.Type.IDENTIFIER]),
@@ -124,7 +129,7 @@ rules_to_choices: List[Tuple[Rule, List[Lexeme.Type]]] = [
     (Rule('W', [Lexeme.Type.IDENTIFIER, WriteAction(), 'W']), [Lexeme.Type.IDENTIFIER]),
     (Rule('W', None), [Lexeme.Type.CLOSING_BRACKET]),
     (Rule('E', ['T', 'F']), [Lexeme.Type.IDENTIFIER, Lexeme.Type.NUMBER, Lexeme.Type.NOT]),
-    (Rule('F', [Lexeme.Type.ASSIGMENT, LexemeAction(), 'T', 'F']), [Lexeme.Type.ASSIGMENT]),
+    (Rule('F', [Lexeme.Type.ADDITIVE, LexemeAction(), 'T', 'F']), [Lexeme.Type.ADDITIVE]),
     (Rule('F', None), [Lexeme.Type.END_OF_PROGRAM, Lexeme.Type.END, Lexeme.Type.TO, Lexeme.Type.CLOSING_BRACKET]),
     (Rule('T', ['M', 'Q']), [Lexeme.Type.IDENTIFIER, Lexeme.Type.NUMBER, Lexeme.Type.NOT]),
     (Rule('Q', [Lexeme.Type.MULTIPLICATIVE, LexemeAction(), 'M', 'Q']), [Lexeme.Type.MULTIPLICATIVE]),

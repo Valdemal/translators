@@ -1,0 +1,7 @@
+VAR a b c res1 res2 ZERO
+BEGIN
+    ZERO := 1 xor 1
+    READ(a b c)
+    res1 := 2 + 2 * 2
+    res2 := not(a) and b or zero
+    WRITE(res1 res2)

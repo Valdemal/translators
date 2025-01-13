@@ -36,9 +36,9 @@ class LexemeAction(Action):
 
 class ReadAction(Action):
     def __call__(self, store: Store):
-        store.append(f'printf("i = "); scanf(&{store.current_lexeme.value});')
+        store.append(f'printf("{store.current_lexeme.value} = "); scanf("%d", &{store.current_lexeme.value});\n\t')
 
 
 class WriteAction(Action):
     def __call__(self, store: Store):
-        store.append(f'printf("i = %d\n", {store.current_lexeme.value});')
+        store.append(f'printf("{store.current_lexeme.value} = %d\\n", {store.current_lexeme.value});\n\t')

@@ -1,0 +1,1 @@
+VAR i c BEGIN c := 2
